@@ -83,7 +83,7 @@ export default function ChatUI() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/chat",
+        "http://localhost:5000/api/chat",
         { message: input },
         { timeout: 10000 }
       );
