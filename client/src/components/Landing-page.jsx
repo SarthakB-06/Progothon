@@ -7,13 +7,14 @@ import {
     MessageSquare,
     Bell,
     ArrowRight,
-    Phone,
-    Clock,
-    CheckCircle2,
 } from "lucide-react"
 
-export default function Home() {
-    return (
+export default function Home() { 
+    return (<>
+
+    <div className="btn btn-ghost fixed bottom-3 right-3 m-2">
+        ssds
+    </div>
         <div className="flex flex-col min-h-screen bg-white">
             {/* Navigation */}
             <header className="sticky top-0 z-50 w-full border-b bg-white">
@@ -304,5 +305,7 @@ export default function Home() {
                 </div>
             </footer>
         </div>
+        
+        </>
     )
 }

@@ -1,15 +1,18 @@
-import React from 'react';
-// import ModernEmergencyGuideLP from './components/landing-page';
-import Home from './components/landing-page';
-// import LandingPage from './components/Landing-page'; 
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Home from "./components/landing-page";
+import ChatUI from "./components/Chat/Chat-ui";
 
 const App = () => {
   return (
-    <div className="">
-      <Home />
-
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/chat" element={<ChatUI />} />
+      </Routes>
+    </Router>
   );
 };
 
-export default App; 
+export default App;
