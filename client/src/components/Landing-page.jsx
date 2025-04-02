@@ -1,5 +1,5 @@
 // Home.jsx
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Heart,
   AlertCircle,
@@ -13,20 +13,60 @@ import {
   Clock,
   CheckCircle2,
   Menu,
-  X
+  X,
+  User,
+  LogOut,
+  ChevronDown,
+  Edit
 } from "lucide-react"
 import { useAuth0 } from "@auth0/auth0-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import ChatPopup from "./Chat/Popup"; // Adjust path as needed
 
 export default function Home() {
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+
+  const toggleProfileDropdown = () => {
+    setProfileDropdownOpen(!profileDropdownOpen);
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+    setProfileDropdownOpen(false);
+  };
+
+  const handleUpdateInfoClick = () => {
+    navigate('/sos');
+    setProfileDropdownOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout({ logoutParams: { returnTo: window.location.origin } });
+    setProfileDropdownOpen(false);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -71,12 +111,52 @@ export default function Home() {
                   Login
                 </button>
               ) : (
-                <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors">
-                  Logout
-                </button>
-              )}
-              {isAuthenticated && (
-                <span className="text-sm font-medium">{user.name}</span>
+                <div className="relative" ref={profileDropdownRef}>
+                  <button
+                    onClick={toggleProfileDropdown}
+                    className="flex items-center gap-2 focus:outline-none"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center overflow-hidden">
+                      {user?.picture ? (
+                        <img
+                          src={user.picture}
+                          alt={user.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-5 w-5 text-red-600" />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium">{user.name}</span>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </button>
+
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
+                      <button
+                        onClick={handleProfileClick}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                      >
+                        <User className="h-4 w-4" />
+                        My Profile
+                      </button>
+                      <button
+                        onClick={handleUpdateInfoClick}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Update Information
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </nav>
           </div>
@@ -100,12 +180,47 @@ export default function Home() {
                     Login
                   </button>
                 ) : (
-                  <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors w-full">
-                    Logout
-                  </button>
-                )}
-                {isAuthenticated && (
-                  <span className="text-sm font-medium py-2">{user.name}</span>
+                  <>
+                    <div className="flex items-center gap-2 py-2">
+                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center overflow-hidden">
+                        {user?.picture ? (
+                          <img
+                            src={user.picture}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-5 w-5 text-red-600" />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium">{user.name}</span>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="text-sm font-medium hover:text-red-600 transition-colors py-2 flex items-center gap-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/sos"
+                      className="text-sm font-medium hover:text-red-600 transition-colors py-2 flex items-center gap-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      Update Information
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout({ logoutParams: { returnTo: window.location.origin } });
+                        setMobileMenuOpen(false);
+                      }}
+                      className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors w-full"
+                    >
+                      Logout
+                    </button>
+                  </>
                 )}
               </div>
             </div>
