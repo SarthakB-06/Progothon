@@ -87,7 +87,7 @@ export default function Home() {
             <div className="relative w-full max-w-md mx-auto">
               <div className="aspect-[16/10] rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-800">
                 <img
-                  src="https://images.unsplash.com/photo-1576091160550-2173fd1c9c35"
+                  src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600"
                   alt="Medical emergency interface"
                   className="w-full h-full object-cover"
                 />
@@ -228,7 +228,7 @@ export default function Home() {
 
             <div className="flex flex-col items-center text-center">
               <img
-                src="https://images.unsplash.com/photo-1585435557343-849d4b5a46a5"
+                src="https://images.pexels.com/photos/6627354/pexels-photo-6627354.jpeg?auto=compress&cs=tinysrgb&w=600"
                 alt="Medical guidance"
                 className="w-32 h-32 rounded-full object-cover mb-4"
               />
@@ -270,7 +270,7 @@ export default function Home() {
             </div>
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1576765607924-3f7b0000a9b6"
+                src="https://images.pexels.com/photos/3844581/pexels-photo-3844581.jpeg?auto=compress&cs=tinysrgb&w=600"
                 alt="Medical technology"
                 className="w-64 h-64 rounded-full object-cover shadow-xl"
               />
