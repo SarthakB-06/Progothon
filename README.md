@@ -121,8 +121,29 @@ npm run dev  # or nodemon index.js
 cd client
 npm run dev
 ```
+---
 
+## **Contributing**
+We welcome contributions! To get started:
+1. Fork the repository.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes and push:
+   ```bash
+   git commit -m "Add feature description"
+   git push origin feature-name
+   ```
+4. Submit a pull request.
 
+---
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 
 
