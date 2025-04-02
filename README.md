@@ -90,7 +90,7 @@ Ensure you have the following installed:
 - ✅ **Node.js** (v16+)
 - ✅ **MongoDB Atlas** (or local MongoDB setup)
 - ✅ **Git**
-- ✅ **npm** or **yarn**
+- ✅ **npm** 
 
 ### **1️⃣ Clone the Repository**
 ```bash
@@ -114,7 +114,7 @@ banani hain abhi++++++++++++++++++++++++
 **Start the Backend Server:**
 ```bash
 cd server
-npm run dev  # or nodemon index.js
+npm run dev 
 ```
 **Start the Frontend:**
 ```bash
@@ -122,6 +122,35 @@ cd client
 npm run dev
 ```
 ---
+
+## 🚀 Future Roadmap  
+
+We are committed to making **MEDAI** more powerful and accessible. Here’s what’s next:  
+
+### **🔹 Phase 1: Web-Based AI Chatbot (Current Stage ✅)**  
+- AI-powered **instant first-aid guidance**  
+- **Voice command support** for hands-free use  
+- **SOS emergency alerts** via Twilio API  
+- **Hospital locator** with Google Maps API  
+
+### **🔹 Phase 2: Mobile App Development 📱**  
+- **React Native app** for Android & iOS  
+- **Push notifications** for emergency alerts  
+- **Enhanced AI assistant** with contextual learning  
+- **Offline access** to essential first-aid instructions  
+
+### **🔹 Phase 3: IoT & Wearable Integration ⌚**  
+- **Smartwatch detection** for falls & accidents  
+- **Automatic SOS alerts** when a critical situation is detected  
+- **Health monitoring integration** with real-time vitals tracking  
+
+### **🔹 Phase 4: Community & AI Expansion 🌍**  
+- **Multilingual support** for accessibility in different regions  
+- **Integration with hospitals & ambulances** for faster medical response  
+- **Crowdsourced emergency reporting** to help users assist others nearby  
+
+🚀 **MEDAI is not just a project, it’s a movement towards a safer world!** 🌍  
+
 
 ## **Contributing**
 We welcome contributions! To get started:
@@ -136,8 +165,6 @@ We welcome contributions! To get started:
    git push origin feature-name
    ```
 4. Submit a pull request.
-
----
 
 ---
 
