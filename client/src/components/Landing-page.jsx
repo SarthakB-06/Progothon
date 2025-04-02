@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Navigation */}
@@ -49,7 +50,6 @@ export default function Home() {
               <span className="text-sm font-medium">{user.name}</span>
             )}
           </nav>
-
         </div>
       </header>
 
@@ -318,5 +318,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

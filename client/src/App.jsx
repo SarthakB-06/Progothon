@@ -3,6 +3,7 @@ import React from 'react';
 import Home from './components/Landing-page';
 import { Routes, Route } from "react-router-dom";
 import FirstAidGuide from './pages/FirstAidGuide';
+import ChatUI from './components/Chat/Chat-ui';
 // import LandingPage from './components/Landing-page'; 
 
 const App = () => {
@@ -10,8 +11,9 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/first-aid" element={<FirstAidGuide />} />
+      <Route path="/chat" element={<ChatUI />} />
     </Routes>
   );
 };
 
-export default App; 
+export default App;
