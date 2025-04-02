@@ -1,4 +1,4 @@
-# MEDAI - AI Powered Instant Medical Guidance
+# MEDAI - AI Powered Instant Medical Guide
 
 ###  🏥 Revolutionizing Emergency Care with AI
 **MEDAI** is an innovative, AI-driven web application designed to provide **instant first-aid guidance** and assist users in medical emergencies. Whether it's a minor injury or a critical situation, **MEDAI** ensures timely, reliable, and life-saving assistance through AI-powered responses, and real-time hospital suggestions.
