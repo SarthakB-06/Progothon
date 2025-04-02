@@ -25,11 +25,45 @@ class ErrorBoundary extends Component {
 
 export default function ChatUI() {
   const [messages, setMessages] = useState([
-    { text: "Hi, how can I help you today?", sender: "bot" },
+    { text: "Hi, I'm your health assistant. How can I help you today?", sender: "bot" },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const [isVoiceSupported, setIsVoiceSupported] = useState(true);
+
+  useEffect(() => {
+    if (!("webkitSpeechRecognition" in window)) {
+      setIsVoiceSupported(false);
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    recognition.onstart = () => setIsRecording(true);
+    recognition.onend = () => setIsRecording(false);
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInput((prev) => prev + transcript);
+    };
+
+    recognition.onerror = () => {
+      setIsVoiceSupported(false);
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const startVoiceRecognition = () => {
+    recognitionRef.current?.start();
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,29 +116,12 @@ export default function ChatUI() {
   };
 
   const handleEmergencyClick = () => {
-    console.log("Emergency Alert clicked!");
     alert("Emergency feature not yet implemented.");
   };
 
-  // Custom components for ReactMarkdown to apply styles
-  const markdownComponents = {
-    p: ({ children }) => <p className="text-sm leading-relaxed">{children}</p>,
-    // Add more custom components as needed (e.g., for links, headings, etc.)
-    a: ({ href, children }) => (
-      <a
-        href={href}
-        className="text-blue-600 hover:underline"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {children}
-      </a>
-    ),
-  };
-
   return (
-    <div className="flex flex-col h-[500px] w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden border border-red-100">
-      {/* Chat Header */}
+    <div className="flex flex-col h-[75vh] sm:h-[80vh] w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-red-200">
+      {/* Header */}
       <div className="flex items-center justify-between p-4 bg-red-700 text-white">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-md">
@@ -119,14 +136,14 @@ export default function ChatUI() {
         </div>
         <button
           onClick={handleEmergencyClick}
-          className="p-1 text-red-100 hover:text-white cursor-pointer focus:outline-none"
+          className="p-1 text-red-100 hover:text-white cursor-pointer"
           title="Emergency Alert"
         >
           <AlertCircle className="h-6 w-6" />
         </button>
       </div>
 
-      {/* Chat Messages */}
+      {/* Messages Area */}
       <div className="flex-1 p-4 overflow-y-auto bg-red-50">
         {messages.map((message, index) => (
           <div
@@ -141,7 +158,7 @@ export default function ChatUI() {
                   ? "bg-red-600 text-white shadow-md"
                   : `bg-white ${
                       message.isError ? "text-red-600" : "text-gray-800"
-                    } shadow-md border border-red-100`
+                    } shadow-md border border-red-200`
               } transition-all duration-200`}
             >
               {message.sender === "bot" && (
@@ -152,39 +169,29 @@ export default function ChatUI() {
                 />
               )}
               <div>
-                {/* Use components prop instead of className */}
                 <ErrorBoundary>
-                  <ReactMarkdown components={markdownComponents}>
-                    {message.text}
-                  </ReactMarkdown>
+                  <ReactMarkdown>{message.text}</ReactMarkdown>
                 </ErrorBoundary>
-                {message.timestamp && (
-                  <span className="text-xs opacity-70">
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </span>
-                )}
               </div>
             </div>
           </div>
         ))}
-        {isLoading && (
-          <div className="flex justify-start mb-4">
-            <div className="max-w-[75%] p-3 rounded-2xl bg-white text-gray-800 shadow-md border border-red-100">
-              <span className="text-sm">Typing...</span>
-            </div>
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Chat Input */}
-      <div className="flex items-center p-3 bg-white border-t border-red-100">
-        <button
-          className="p-2 text-red-600 hover:text-red-700"
-          disabled={isLoading}
-        >
-          <Mic className="h-5 w-5" title="Voice Input" />
-        </button>
+      {/* Input Bar */}
+      <div className="flex items-center p-3 bg-white border-t border-red-200">
+        {isVoiceSupported && (
+          <button
+            className={`p-2 ${
+              isRecording ? "text-green-600" : "text-red-600"
+            } hover:text-red-700`}
+            onClick={startVoiceRecognition}
+            disabled={isLoading}
+          >
+            <Mic className="h-5 w-5" title="Voice Input" />
+          </button>
+        )}
         <input
           type="text"
           value={input}
@@ -197,7 +204,7 @@ export default function ChatUI() {
         <button
           onClick={handleSendMessage}
           disabled={isLoading}
-          className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 disabled:bg-red-400"
+          className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
         >
           <Send className="h-5 w-5" />
         </button>
