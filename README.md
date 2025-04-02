@@ -119,7 +119,7 @@ npm run dev
 **Start the Frontend:**
 ```bash
 cd client
-npm run dev
+npm start
 ```
 ---
 
