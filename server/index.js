@@ -8,6 +8,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const twilio = require("twilio");
+
+const twilioClient = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+);
+const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
+
 // Improved MongoDB connection with better error handling
 mongoose
     .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -173,16 +181,80 @@ app.get("/api/sos/:userId", async (req, res) => {
 app.post("/api/sos/alert", async (req, res) => {
     try {
         const { userId } = req.body;
-        if (!userId) return res.status(400).json({ error: "User ID is required" });
+        console.log("Received SOS alert request for userId:", userId);
+
+        if (!userId) {
+            console.log("Error: No userId provided in request");
+            return res.status(400).json({ error: "User ID is required" });
+        }
+
+        // Check Fast2SMS configuration
+        if (!process.env.FAST2SMS_API_KEY) {
+            console.error("Missing Fast2SMS API key");
+            return res.status(500).json({ error: "Fast2SMS configuration is incomplete" });
+        }
 
         const sosData = await SOS.findOne({ userId });
-        if (!sosData) return res.status(404).json({ message: "No contacts found" });
+        console.log("Found SOS data:", sosData ? "Yes" : "No");
 
-        console.log(`🚨 ALERT! ${sosData.name} triggered SOS! Notifying contacts...`);
-        res.json({ message: "SOS Alert Triggered!" });
+        if (!sosData) {
+            console.log("No emergency contacts found for userId:", userId);
+            return res.status(404).json({ message: "No emergency contacts found" });
+        }
+
+        if (!sosData.emergencyContacts || sosData.emergencyContacts.length === 0) {
+            console.log("No emergency contacts configured for user:", userId);
+            return res.status(400).json({ message: "No emergency contacts configured" });
+        }
+
+        console.log(`🚨 ALERT! ${sosData.name} triggered SOS! Sending SMS...`);
+
+        // Prepare message
+        const emergencyMessage = `🚨 SOS ALERT! ${sosData.name} needs urgent help. Contact: ${sosData.phone}`;
+
+        // Extract phone numbers of emergency contacts
+        const phoneNumbers = sosData.emergencyContacts.map(contact => contact.phone).join(",");
+
+        try {
+            // Send SMS using Fast2SMS
+            const response = await axios.post(
+                "https://www.fast2sms.com/dev/bulkV2",
+                {
+                    route: "q",
+                    message: emergencyMessage,
+                    language: "english",
+                    numbers: phoneNumbers,
+                },
+                {
+                    headers: {
+                        authorization: process.env.FAST2SMS_API_KEY,
+                    },
+                }
+            );
+
+            console.log("Fast2SMS Response:", response.data);
+
+            if (response.data.return === true) {
+                res.json({ message: "SOS Alert Sent Successfully!" });
+            } else {
+                throw new Error(response.data.message || "Failed to send SMS");
+            }
+        } catch (smsError) {
+            console.error("Fast2SMS Error:", {
+                message: smsError.message,
+                response: smsError.response?.data
+            });
+            throw smsError;
+        }
     } catch (error) {
-        console.error("Error processing SOS alert:", error);
-        res.status(500).json({ error: "Server error" });
+        console.error("❌ Error processing SOS alert:", {
+            error: error.message,
+            response: error.response?.data
+        });
+        res.status(500).json({
+            error: "Failed to send SOS alert",
+            details: error.message
+        });
     }
 });
 
