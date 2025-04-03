@@ -24,15 +24,61 @@ class ErrorBoundary extends Component {
 }
 
 export default function ChatUI() {
-  const [messages, setMessages] = useState([
-    { text: "Hi, I'm your health assistant. How can I help you today?", sender: "bot" },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
   const [isVoiceSupported, setIsVoiceSupported] = useState(true);
+  
+  const MAX_STORED_MESSAGES = 15; // Maximum number of messages to store
+  const STORAGE_KEY = "medai_chat_history";
+  
+  // Load messages from localStorage on initial render
+  useEffect(() => {
+    const loadStoredMessages = () => {
+      try {
+        const storedMessages = localStorage.getItem(STORAGE_KEY);
+        if (storedMessages) {
+          const parsedMessages = JSON.parse(storedMessages);
+          if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+            setMessages(parsedMessages);
+            return;
+          }
+        }
+        // If no stored messages or invalid data, set default welcome message
+        setMessages([
+          { text: "Hi, I'm your health assistant. How can I help you today?", sender: "bot" },
+        ]);
+      } catch (error) {
+        console.error("Failed to load stored messages:", error);
+        // Fallback to default welcome message
+        setMessages([
+          { text: "Hi, I'm your health assistant. How can I help you today?", sender: "bot" },
+        ]);
+      }
+    };
+
+    loadStoredMessages();
+  }, []);
+  
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    const saveMessages = () => {
+      try {
+        if (messages.length > 0) {
+          // Store only the last MAX_STORED_MESSAGES messages
+          const messagesToStore = messages.slice(-MAX_STORED_MESSAGES);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(messagesToStore));
+        }
+      } catch (error) {
+        console.error("Failed to save messages to localStorage:", error);
+      }
+    };
+
+    saveMessages();
+  }, [messages]);
 
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
@@ -82,9 +128,19 @@ export default function ChatUI() {
     setIsLoading(true);
 
     try {
+      // Create a complete history array including the current message
+      const completeHistory = [...messages, userMessage];
+      // Limit to last 15 messages for API call
+      const limitedHistory = completeHistory.slice(-15);
+      
+      console.log("Sending limited chat history (last 15 messages):", limitedHistory);
+      
       const response = await axios.post(
         "http://localhost:5000/api/chat",
-        { message: input },
+        { 
+          message: input,
+          chatHistory: limitedHistory // Send only last 15 messages
+        },
         { timeout: 10000 }
       );
 
@@ -118,6 +174,19 @@ export default function ChatUI() {
   const handleEmergencyClick = () => {
     alert("Emergency feature not yet implemented.");
   };
+  
+  const clearChatHistory = () => {
+    if (window.confirm("Are you sure you want to clear the chat history?")) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        setMessages([
+          { text: "Hi, I'm your health assistant. How can I help you today?", sender: "bot" },
+        ]);
+      } catch (error) {
+        console.error("Failed to clear chat history:", error);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col h-[75vh] sm:h-[80vh] w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-red-200">
@@ -134,13 +203,26 @@ export default function ChatUI() {
             </p>
           </div>
         </div>
-        <button
-          onClick={handleEmergencyClick}
-          className="p-1 text-red-100 hover:text-white cursor-pointer"
-          title="Emergency Alert"
-        >
-          <AlertCircle className="h-6 w-6" />
-        </button>
+        <div className="flex">
+          <button
+            onClick={clearChatHistory}
+            className="p-1 text-red-100 hover:text-white cursor-pointer mr-2"
+            title="Clear Chat History"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button
+            onClick={handleEmergencyClick}
+            className="p-1 text-red-100 hover:text-white cursor-pointer"
+            title="Emergency Alert"
+          >
+            <AlertCircle className="h-6 w-6" />
+          </button>
+        </div>
       </div>
 
       {/* Messages Area */}
