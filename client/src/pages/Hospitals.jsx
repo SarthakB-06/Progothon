@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import axios from "axios";
 import { MapPin, Phone, Clock, Star, X } from 'lucide-react';
+// import dotenv from 'dotenv';
 
-const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+// dotenv.config();
+
+// Use the API key directly
+const API_KEY = "AIzaSyBClX4lrY7S2FmXZdnwiCHlJqCvt889I-8";
 
 const Hospitals = () => {
     const [hospitals, setHospitals] = useState([]);
@@ -52,11 +56,15 @@ const Hospitals = () => {
                 }
             });
             console.log("Received hospitals data:", response.data);
-            setHospitals(response.data.results || []);
+            if (response.data.results) {
+                setHospitals(response.data.results);
+            } else {
+                setHospitals([]);
+            }
             setLoading(false);
         } catch (error) {
             console.error("Error fetching hospitals:", error);
-            setError("Failed to fetch nearby hospitals. Please try again later.");
+            setError(error.response?.data?.error || "Failed to fetch nearby hospitals. Please try again later.");
             setLoading(false);
         }
     };

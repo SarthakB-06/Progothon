@@ -48,11 +48,31 @@ app.get("/api/nearby-hospitals", async (req, res) => {
             return res.status(400).json({ error: "Latitude and longitude are required" });
         }
 
+        // Validate coordinates
+        const latNum = parseFloat(lat);
+        const lngNum = parseFloat(lng);
+
+        if (isNaN(latNum) || isNaN(lngNum)) {
+            console.log("Invalid coordinates:", { lat, lng });
+            return res.status(400).json({ error: "Invalid coordinates provided" });
+        }
+
+        if (latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
+            console.log("Coordinates out of range:", { lat: latNum, lng: lngNum });
+            return res.status(400).json({ error: "Coordinates are out of valid range" });
+        }
+
+        if (!process.env.GOOGLE_MAPS_API_KEY) {
+            console.error("Google Maps API key is not configured");
+            return res.status(500).json({ error: "Server configuration error" });
+        }
+
+        console.log("Making request to Google Places API...");
         const response = await axios.get(
             `https://maps.googleapis.com/maps/api/place/nearbysearch/json`,
             {
                 params: {
-                    location: `${lat},${lng}`,
+                    location: `${latNum},${lngNum}`,
                     radius: 5000,
                     type: "hospital",
                     key: process.env.GOOGLE_MAPS_API_KEY
@@ -60,13 +80,44 @@ app.get("/api/nearby-hospitals", async (req, res) => {
             }
         );
 
-        console.log("Google Places API response status:", response.status);
-        console.log("Number of hospitals found:", response.data.results?.length || 0);
+        console.log("Google Places API response received");
 
+        if (response.data.status !== "OK") {
+            console.error("Google Places API error:", response.data.status);
+            return res.status(400).json({
+                error: "Failed to fetch hospitals",
+                details: response.data.status
+            });
+        }
+
+        console.log("Number of hospitals found:", response.data.results?.length || 0);
         res.json(response.data);
     } catch (error) {
-        console.error("Error fetching nearby hospitals:", error);
-        res.status(500).json({ error: "Failed to fetch nearby hospitals" });
+        console.error("Error in nearby-hospitals endpoint:", error);
+
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error("Error response:", error.response.data);
+            return res.status(error.response.status).json({
+                error: "Failed to fetch hospitals",
+                details: error.response.data
+            });
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error("No response received:", error.request);
+            return res.status(503).json({
+                error: "Service unavailable",
+                details: "No response from Google Places API"
+            });
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error("Error setting up request:", error.message);
+            return res.status(500).json({
+                error: "Server error",
+                details: error.message
+            });
+        }
     }
 });
 
