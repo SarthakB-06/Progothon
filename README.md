@@ -35,7 +35,6 @@ With India's **massive population and uneven healthcare access**, **MEDAI empowe
 🚨 **SOS Emergency Alerts** – Instantly notifies emergency contacts via Twilio API.  
 🗺️ **Hospital Locator** – Suggests nearby hospitals using Google Maps API.  
 📁 **Medical Data Storage** – Securely saves medical data and emergency contacts for quick access.
-⚡ **Fast & Responsive UI** – Built with React.js, optimized for a seamless experience.  
 
 ---
 ## 🛠️ Technologies Used  
@@ -56,8 +55,8 @@ MEDAI is built using cutting-edge technologies to ensure **speed, reliability, a
 - 🔐 **Auth0** – Secure authentication and user management
 
 ### **DevOps & Deployment**  
-- ☁️ **Vercel / Netlify** – Frontend hosting  
-- 🛠️ **Render / AWS / Heroku** – Backend deployment  
+- ☁️ **Vercel** – Frontend hosting  
+- 🛠️ **Render** – Backend deployment  
 - 🔧 **Git & GitHub** – Version control and collaboration  
 
 ---
@@ -94,8 +93,11 @@ touch .env
 **Add the following keys to the file:**
 ```bash
 GEMINI_API_KEY=your_gemeni_api_key
-MONGODB_URI=Your_modgodd_api_key
+MONGODB_URI=your_modgodd_api_key
 MAPS_API_KEY=your_google_maps_api_key
+TWILIO_ACCOUNT_SID=your_twilio_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=twilio_phone_number
 ```
 ### **4️⃣ Run the Application**
 **Start the Backend Server:**
@@ -138,7 +140,7 @@ We are committed to making **MEDAI** more powerful and accessible. Here’s what
 
 🚀 **MEDAI is not just a project, it’s a movement towards a safer world!** 🌍  
 
-
+---
 ## **Contributing**
 We welcome contributions! To get started:
 1. Fork the repository.
