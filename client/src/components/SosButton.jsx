@@ -1,15 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import { useAuth0 } from "@auth0/auth0-react";
 
-const SOSButton = () => {
-    const { isAuthenticated, user } = useAuth0();
+const SOSButton = ({ userId }) => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
     const handleSOS = async () => {
-        if (!isAuthenticated || !user) {
-            setMessage("Please log in to use the SOS feature.");
+        if (!userId) {
+            setMessage("User ID is missing. Please log in.");
             return;
         }
 
@@ -17,9 +15,8 @@ const SOSButton = () => {
         setMessage("");
 
         try {
-            const response = await axios.post('http://localhost:5000/api/sos/alert', {
-                userId: user.sub
-            });
+            const response = await axios.post(`http://localhost:5000/api/sos/alert`, { userId });
+
             setMessage(response.data.message);
         } catch (error) {
             console.error("Error triggering SOS:", error);

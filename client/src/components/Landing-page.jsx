@@ -17,21 +17,23 @@ import {
   User,
   LogOut,
   ChevronDown,
-  Edit
+  Edit,
+  Loader2
 } from "lucide-react"
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link, useNavigate } from "react-router-dom";
 // import { Navbar } from "./Navbar/Navbar";
-import SosButton from "./SosButton";
-
 import ChatPopup from "./Chat/Popup"; // Adjust path as needed
+import SosButton from "./SosButton";
 
 
 export default function Home() {
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const profileDropdownRef = useRef(null);
+  const featuresRef = useRef(null);
   const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
@@ -62,6 +64,21 @@ export default function Home() {
     setMobileMenuOpen(false);
   };
 
+  const handleGetStarted = async () => {
+    setIsLoading(true);
+    try {
+      await loginWithRedirect();
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const scrollToFeatures = () => {
+    featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -80,7 +97,8 @@ export default function Home() {
     <>
       <ChatPopup />
       <div className="flex flex-col min-h-screen bg-white">
-       
+        {/* <Navbar /> */}
+
         <header className="sticky top-0 z-50 w-full border-b bg-white">
           <div className="container mx-auto px-4 flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
@@ -114,7 +132,7 @@ export default function Home() {
                 Guide
               </Link>
               <Link to="/hospitals" className="mx-4">Nearby Hospitals</Link>
-              <SosButton />
+              <SosButton userId={user?.sub} />
 
 
               {!isAuthenticated ? (
@@ -238,9 +256,7 @@ export default function Home() {
           )}
         </header>
 
-        {/* Hero Section */}
         <section className="relative py-20 md:py-32 bg-gradient-to-b from-red-50 to-white">
-       
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1 space-y-6">
               <div className="inline-block px-3 py-1 rounded-full bg-red-100 text-red-600 text-sm font-medium">
@@ -254,12 +270,26 @@ export default function Home() {
                 directly from your browser - no installation needed.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-6 py-3 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors flex items-center">
-                  Get Started Now
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                <button
+                  onClick={handleGetStarted}
+                  disabled={isLoading}
+                  className="px-6 py-3 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors flex items-center justify-center min-w-[160px] relative group"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      Get Started Now
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
                 </button>
-                <button className="px-6 py-3 rounded-md border border-red-600 text-red-600 hover:bg-red-50 transition-colors">
+                <button
+                  onClick={scrollToFeatures}
+                  className="px-6 py-3 rounded-md border border-red-600 text-red-600 hover:bg-red-50 transition-colors group"
+                >
                   Learn More
+                  <span className="inline-block transition-transform group-hover:translate-y-1">↓</span>
                 </button>
               </div>
             </div>
@@ -288,7 +318,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Emergency Stats */}
         <section className="py-12 bg-red-600 text-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -308,8 +337,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-20 bg-white">
+        <section id="features" ref={featuresRef} className="py-20 bg-white scroll-mt-16">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Critical Features When You Need Them</h2>
@@ -383,7 +411,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works */}
         <section id="how-it-works" className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
@@ -433,7 +460,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Get Started CTA */}
         <section id="get-started" className="py-20 bg-red-600 text-white">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
@@ -459,7 +485,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
         <footer className="py-12 bg-gray-900 text-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
