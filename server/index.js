@@ -272,18 +272,49 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 app.post("/api/chat", async (req, res) => {
-    const { message } = req.body;
+    const { message, chatHistory } = req.body;
     if (!message) return res.status(400).json({ error: "Message is required" });
     if (!GEMINI_API_KEY) return res.status(500).json({ error: "Gemini API key is not configured" });
 
     try {
+        // Format chat history for Gemini with clear conversation structure
+        let formattedHistory = "";
+        if (chatHistory && Array.isArray(chatHistory) && chatHistory.length > 0) {
+            // Create a more structured conversation format
+            formattedHistory = "CONVERSATION HISTORY:\n";
+            
+            // Log the chat history for debugging
+            console.log("Received chat history:", JSON.stringify(chatHistory, null, 2));
+            
+            chatHistory.forEach((msg, index) => {
+                if (msg.sender === "user") {
+                    formattedHistory += `Human: ${msg.text}\n`;
+                } else if (msg.sender === "bot") {
+                    formattedHistory += `Assistant: ${msg.text}\n`;
+                }
+            });
+            
+            formattedHistory += "\nCURRENT CONVERSATION:\n";
+        }
+
+        // Prepare the prompt with system prompt, chat history, and current message
+        const fullPrompt = `${SYSTEM_PROMPT}\n\n${formattedHistory}Human: ${message}\nAssistant:`;
+
+        console.log("Sending to Gemini:", fullPrompt);
+
         const response = await axios.post(
             `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
             {
                 contents: [{
                     role: "user",
-                    parts: [{ text: `${SYSTEM_PROMPT}\n\n${message}` }],
+                    parts: [{ text: fullPrompt }],
                 }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topK: 40,
+                    topP: 0.95,
+                    maxOutputTokens: 1024,
+                },
             },
             { headers: { "Content-Type": "application/json" } }
         );
