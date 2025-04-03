@@ -34,29 +34,8 @@ With India's **massive population and uneven healthcare access**, **MEDAI empowe
 ✅ **AI-Powered First Aid Guide** – Step-by-step instructions for handling medical situations.  
 🚨 **SOS Emergency Alerts** – Instantly notifies emergency contacts via Twilio API.  
 🗺️ **Hospital Locator** – Suggests nearby hospitals using Google Maps API.  
+📁 **Medical Data Storage** – Securely saves medical data and emergency contacts for quick access.
 ⚡ **Fast & Responsive UI** – Built with React.js, optimized for a seamless experience.  
-
----
-
-## 🌟 Why MEDAI Matters – A Life-Saving Innovation 
-
-### 🚨 **India’s Healthcare Crisis: Lack of Medical Knowledge is Deadly**  
-India faces **one of the highest preventable death rates in the world** due to **limited first-aid knowledge, delayed medical response, and lack of accessibility to emergency care**.  
-
-- 🏥 **70% of Indians lack basic first-aid training**  
-- ⏳ **Ambulance response times often exceed critical limits**  
-- 💔 **Thousands die each year from treatable emergencies** (heart attacks, choking, accidents)  
-- 🚑 **Rural areas suffer from poor healthcare access**  
-
-### 🩺 **MEDAI: A Step Towards Saving Lives**  
-With India's **massive population and uneven healthcare access**, **MEDAI empowers people with life-saving first-aid knowledge at their fingertips**.  
-
-✅ **Bridging the gap** between emergencies and medical response  
-✅ **Making first-aid accessible** to rural & urban communities  
-✅ **Equipping people with knowledge** to handle medical crises effectively  
-✅ **Saving lives when every second counts**  
-
-🌟 **MEDAI ensures that medical knowledge is no longer a privilege but a right for every Indian citizen.**  
 
 ---
 ## 🛠️ Technologies Used  
@@ -64,18 +43,17 @@ With India's **massive population and uneven healthcare access**, **MEDAI empowe
 MEDAI is built using cutting-edge technologies to ensure **speed, reliability, and accessibility** in medical emergencies.  
 
 ### **Frontend (Web & Mobile)**  
-- ⚛️ **React.js / React Native** – For a dynamic and responsive user experience  
-- 🎨 **Framer Motion** – For smooth UI animations  
+- ⚛️ **React.js** – For a dynamic and responsive user experience  
 - 🌍 **Google Maps API** – For hospital location services  
 
 ### **Backend & Server**  
-- 🚀 **Node.js & Express.js** – For a scalable and efficient backend  
-- 💾 **MongoDB Atlas** – Secure cloud database for storing user data  
+- 🚀 **Node.js** – For a scalable and efficient backend  
+- 💾 **MongoDB** – Secure cloud database for storing first-aid guide data
 
 ### **AI & APIs**  
-- 🧠 **OpenAI API** – AI-powered chatbot for medical assistance  
-- 🗣️ **Google Speech-to-Text** – Enables hands-free voice commands  
-- 📞 **Twilio API** – Sends emergency SOS alerts  
+- 🧠 **Gemeni API** – AI-powered chatbot for medical assistance  
+- 📞 **Twilio API** – Sends emergency SOS alerts
+- 🔐 **Auth0** – Secure authentication and user management
 
 ### **DevOps & Deployment**  
 - ☁️ **Vercel / Netlify** – Frontend hosting  
@@ -109,7 +87,16 @@ cd server
 npm install
 ```
 ### **3️⃣ Set Up Environment Variables**
-banani hain abhi++++++++++++++++++++++++
+```bash
+cd server
+touch .env
+```
+**Add the following keys to the file:**
+```bash
+GEMINI_API_KEY=your_gemeni_api_key
+MONGODB_URI=Your_modgodd_api_key
+MAPS_API_KEY=your_google_maps_api_key
+```
 ### **4️⃣ Run the Application**
 **Start the Backend Server:**
 ```bash
