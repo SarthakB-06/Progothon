@@ -54,6 +54,11 @@ export default function Home() {
     setProfileDropdownOpen(false);
   };
 
+  const handleHospitalsClick = () => {
+    navigate('/hospitals');
+    setMobileMenuOpen(false);
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -105,6 +110,8 @@ export default function Home() {
               <Link to="/first-aid" className="text-sm font-medium hover:text-red-600 transition-colors">
                 Guide
               </Link>
+              <Link to="/hospitals" className="mx-4">Nearby Hospitals</Link>
+
 
               {!isAuthenticated ? (
                 <button onClick={() => loginWithRedirect()} className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors">

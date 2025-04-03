@@ -8,13 +8,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// MongoDB Connection
+// Improved MongoDB connection with better error handling
 mongoose
     .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => {
         console.error("MongoDB Connection Error:", err);
-        process.exit(1);
+        process.exit(1); // Exit if cannot connect to database
     });
 
 // Schemas
@@ -33,9 +33,42 @@ const SosSchema = new mongoose.Schema({
     email: String,
     bloodGroup: String,
     medicalHistory: String,
-    emergencyContacts: [{ name: String, phone: String }]
+    emergencyContacts: [{ name: String, phone: String }] // Array for multiple contacts
 });
 const SOS = mongoose.model("SOS", SosSchema);
+
+// Google Places API endpoint
+app.get("/api/nearby-hospitals", async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+        console.log("Received request for nearby hospitals with coordinates:", { lat, lng });
+
+        if (!lat || !lng) {
+            console.log("Missing coordinates in request");
+            return res.status(400).json({ error: "Latitude and longitude are required" });
+        }
+
+        const response = await axios.get(
+            `https://maps.googleapis.com/maps/api/place/nearbysearch/json`,
+            {
+                params: {
+                    location: `${lat},${lng}`,
+                    radius: 5000,
+                    type: "hospital",
+                    key: process.env.GOOGLE_MAPS_API_KEY
+                }
+            }
+        );
+
+        console.log("Google Places API response status:", response.status);
+        console.log("Number of hospitals found:", response.data.results?.length || 0);
+
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error fetching nearby hospitals:", error);
+        res.status(500).json({ error: "Failed to fetch nearby hospitals" });
+    }
+});
 
 // First Aid Endpoint
 app.get("/api/first-aid", async (req, res) => {
