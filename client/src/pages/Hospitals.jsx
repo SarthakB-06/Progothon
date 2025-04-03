@@ -3,7 +3,7 @@ import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/ap
 import axios from "axios";
 import { MapPin, Phone, Clock, Star, X } from 'lucide-react';
 
-const API_KEY = "AIzaSyBClX4lrY7S2FmXZdnwiCHlJqCvt889I-8";
+const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 const Hospitals = () => {
     const [hospitals, setHospitals] = useState([]);
